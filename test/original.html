@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<title>qUint Test Runner</title>
+	
+	<!-- basic lib -->
+	<script src="../vendor/jquery-1.3.2.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8" src="../vendor/logger.js"></script>
+	
+	<!-- for test -->
+	<script type="text/javascript" charset="utf-8" src="../vendor/qunit/testrunner.js"></script>
+	<link rel="stylesheet" href="../vendor/qunit/testsuite.css" type="text/css" media="screen" charset="utf-8"/>
+	<script type="text/javascript" charset="utf-8" src="../vendor/qunit-spec/qunit_spec.js"></script>
+  
+  <!-- execute -->
+  <!--script type="text/javascript" charset="utf-8" src="../vendor/jquery.query.js"></script-->
+  <script type="text/javascript" charset="utf-8" src="../jquery.query-2.1.5-fixed.js"></script>
+  <script type="text/javascript" charset="utf-8" src="./script/original_test.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var has_fixed_bugs = true;
+      original_test(has_fixed_bugs);
+    });
+  </script>
+  
+</head> 
+<body>
+<div id="test-results">
+  <h1>qUnit test</h1>
+  <h2 id="banner"></h2>
+  <h2 id="userAgent"></h2>
+  <ol id="tests"></ol>
+  <div id="main"></div>
+</div>
+</body> 
+</html>

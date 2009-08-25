@@ -10,7 +10,7 @@ use $.query instead of $.query.load
 
     var query_object = $.query(location);
 
-see test/queryobject for more information.
+see test/parsequery for more information.
 
 
 about QUERY STRING OBJECT v2.1.5 bug fixed

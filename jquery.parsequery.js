@@ -1,4 +1,3 @@
-var log = getLogger();
 /**
  * edit by sousk.net
  *
@@ -24,7 +23,7 @@ new function(settings) {
   var $hash = $prefix ? settings.hash === true ? "#" : "?" : "";
   var $numbers = settings.numbers === false ? false : true;
   
-  jQuery.query = new function() {
+  jQuery.parsequery = new function() {
     var is = function(o, t) {
       return o != undefined && o !== null && (!!t ? o.constructor == t : true);
     };
@@ -260,4 +259,4 @@ new function(settings) {
       return q;
     };
   };
-}(jQuery.query || {}); // Pass in jQuery.query as settings object
+}(jQuery.parsequery || {}); // Pass in jQuery.query as settings object

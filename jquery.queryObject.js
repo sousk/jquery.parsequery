@@ -1,3 +1,10 @@
+var log = getLogger();
+/**
+ * edit by sousk.net
+ *
+ * http://docs.jquery.com/Plugins/Authoring
+ */
+
 /**
  * jQuery.query - Query String Modification and Creation for jQuery
  * Written by Blair Mitchelmore (blair DOT mitchelmore AT gmail DOT com)
@@ -21,9 +28,18 @@ new function(settings) {
     var is = function(o, t) {
       return o != undefined && o !== null && (!!t ? o.constructor == t : true);
     };
+    // when path is 'testy[1]',
+    // then returns ["testy", ["1"]]
     var parse = function(path) {
-      var m, rx = /\[([^[]*)\]/g, match = /^(\S+?)(\[\S*\])?$/.exec(path), base = match[1], tokens = [];
-      while (m = rx.exec(match[2])) tokens.push(m[1]);
+      // var m, rx = /\[([^[]*)\]/g, match = /^(\S+?)(\[\S*\])?$/.exec(path), base = match[1], tokens = [];
+      var m, rx = /\[([^[]*)\]/g, match = /^(\S+?)(\[\S*\])?$/.exec(path), tokens = [];
+      if (match && match[1]) {
+        base = match[1];
+        while (m = rx.exec(match[2])) tokens.push(m[1]);
+      }
+      else {
+        base = path;
+      }
       return [base, tokens];
     };
     var set = function(target, tokens, value) {
@@ -71,7 +87,8 @@ new function(settings) {
           self.SET(key, val);
         });
       } else {
-        jQuery.each(arguments, function() {
+        jQuery.each(arguments, function(i, v) {
+          if (i > 0) log("-----------------------------",i, v);
           var q = "" + this;
           q = q.replace(/^[?#]/,''); // remove any leading ? || #
           q = q.replace(/[;&]$/,''); // remove any trailing & || ;
@@ -79,7 +96,16 @@ new function(settings) {
           
           jQuery.each(q.split(/[&;]/), function(){
             var key = decodeURIComponent(this.split('=')[0]);
-            var val = decodeURIComponent(this.split('=')[1]);
+            // var val = decodeURIComponent(this.split('=')[1]);
+            var val = (function(keyval, key) {
+              if (key) {
+                var val = keyval.split('=')[1];
+                return val ? decodeURIComponent(val) : true;
+              }
+              else {
+                return null;
+              }
+            })(this, key);
             
             if (!key) return;
             
@@ -182,6 +208,13 @@ new function(settings) {
       compact: function() {
         return this.copy().COMPACT();
       },
+      setBase: function(base_url) {
+        this.base_url = base_url;
+        return this;
+      },
+      getBase: function() {
+        return this.base_url;
+      },
       toString: function() {
         var i = 0, queryString = [], chunks = [], self = this;
         var addFields = function(arr, key, value) {
@@ -210,10 +243,21 @@ new function(settings) {
         if (chunks.length > 0) queryString.push($hash);
         queryString.push(chunks.join($separator));
         
-        return queryString.join("");
+        return (this.getBase() || "") + queryString.join("");
       }
     };
     
-    return new queryObject(location.search, location.hash);
+    // return new queryObject(location.search, location.hash);
+    return function(url) {
+      // var search = url.replace(/^.*?[?](.+?)(?:#.+)?$/, "$1");
+      var bs = (function() {
+        var p = url.split('?');
+        return p.length > 1 ? {base: p.shift(), search:p.join()} : {base:null, search:p[0]};
+      })();
+      
+      var q = new queryObject(bs.search);
+      if (bs.base) q.setBase(bs.base);
+      return q;
+    };
   };
 }(jQuery.query || {}); // Pass in jQuery.query as settings object

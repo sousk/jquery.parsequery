@@ -26,7 +26,6 @@ function original_test(has_fixed) {
       equals(q.get('debug'), true); // it got "undefined"
     });
   }
-  return;
   
   //----------------------------------------------------------
   module("examples");

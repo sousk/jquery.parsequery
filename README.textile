@@ -2,6 +2,9 @@ h2. Forked QUERY STRING OBJECT
 
 This is forked from http://plugins.jquery.com/project/query-object v2.1.5
 
- * stop auto-parse
+done:
  * fix bug
  * add tests
+
+not-yet
+ * stop auto-parse

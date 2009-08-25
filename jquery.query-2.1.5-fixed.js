@@ -89,7 +89,16 @@ new function(settings) {
           
           jQuery.each(q.split(/[&;]/), function(){
             var key = decodeURIComponent(this.split('=')[0]);
-            var val = decodeURIComponent(this.split('=')[1]);
+            // var val = decodeURIComponent(this.split('=')[1]);
+            var val = (function(keyval, key) {
+              if (key) {
+                var val = keyval.split('=')[1];
+                return val ? decodeURIComponent(val) : true;
+              }
+              else {
+                return null;
+              }
+            })(this, key);
             
             if (!key) return;
             

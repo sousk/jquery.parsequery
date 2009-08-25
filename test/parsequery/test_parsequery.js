@@ -36,6 +36,7 @@ function test_parsequery() {
     var newq = "http://example.com/hoge/";
     setup(newq);
     equals(q.toString(), newq);
+    equals(q.set('foo', 123).toString(), newq+'?foo=123');
   });
   
   //----------------------------------------------------------

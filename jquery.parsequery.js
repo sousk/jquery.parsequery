@@ -181,7 +181,9 @@ new function(settings) {
         return this.copy().EMPTY();
       },
       copy: function() {
-        return new queryObject(this);
+        var q = new queryObject(this);
+        q.setBase(this.getBase());
+        return q;
       },
       COMPACT: function() {
         function build(orig) {

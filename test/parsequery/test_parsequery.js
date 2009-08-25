@@ -32,6 +32,10 @@ function test_parsequery() {
   test("handle with base component", function() {
     setup();
     equals(q.toString(), default_query_encoded);
+    
+    var newq = "http://example.com/hoge/";
+    setup(newq);
+    equals(q.toString(), newq);
   });
   
   //----------------------------------------------------------

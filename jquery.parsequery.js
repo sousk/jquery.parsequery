@@ -87,7 +87,6 @@ new function(settings) {
         });
       } else {
         jQuery.each(arguments, function(i, v) {
-          if (i > 0) log("-----------------------------",i, v);
           var q = "" + this;
           q = q.replace(/^[?#]/,''); // remove any leading ? || #
           q = q.replace(/[;&]$/,''); // remove any trailing & || ;
@@ -248,15 +247,31 @@ new function(settings) {
     
     // return new queryObject(location.search, location.hash);
     return function(url) {
-      // var search = url.replace(/^.*?[?](.+?)(?:#.+)?$/, "$1");
-      var bs = (function() {
-        var p = url.split('?');
-        return p.length > 1 ? {base: p.shift(), search:p.join()} : {base:null, search:p[0]};
-      })();
-      
-      var q = new queryObject(bs.search);
-      if (bs.base) q.setBase(bs.base);
+      function parse_url() {
+        var m = url.match(/^(.*?)[?](.+?)(?:#.+)?$/);
+        return m ? {
+          base: m[1],
+          search: m[2]
+        } : {
+          base: url,
+          search: ""
+        };
+      };
+      var u = parse_url(url);
+      var q = new queryObject(u.search);
+      q.setBase(u.base);
       return q;
     };
+    // function(url) {
+    //   // var search = url.replace(/^.*?[?](.+?)(?:#.+)?$/, "$1");
+    //   var bs = (function() {
+    //     var p = url.split('?');
+    //     return p.length > 1 ? {base: p.shift(), search:p.join()} : {base:null, search:p[0]};
+    //   })();
+    //   
+    //   var q = new queryObject(bs.search);
+    //   if (bs.base) q.setBase(bs.base);
+    //   return q;
+    // };
   };
 }(jQuery.parsequery || {}); // Pass in jQuery.query as settings object

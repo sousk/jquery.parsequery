@@ -27,6 +27,18 @@ function test_parsequery() {
   }
 
   //----------------------------------------------------------
+  module("basement");
+  //----------------------------------------------------------
+  test("init with empty param", function() {
+    ok(q = $.parsequery(undefined));
+    equals(q.set('foo', 'bar').toString(), "?foo=bar");
+  });
+  test("parameters", function() {
+    ok($.parsequery('', {hash: ''}));
+    equals(q.set('foo', 'bar').toString(), "foo=bar");
+  });
+  
+  //----------------------------------------------------------
   module("url + parameter");
   //----------------------------------------------------------
   test("handle with base component", function() {

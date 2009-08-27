@@ -1,7 +1,5 @@
 /**
  * edit by sousk.net
- *
- * http://docs.jquery.com/Plugins/Authoring
  */
 
 /**
@@ -14,14 +12,25 @@
  * @version 2.1.5
  *
  **/
-new function(settings) { 
-  // Various Settings
-  var $separator = settings.separator || '&';
-  var $spaces = settings.spaces === false ? false : true;
-  var $suffix = settings.suffix === false ? '' : '[]';
-  var $prefix = settings.prefix === false ? false : true;
-  var $hash = $prefix ? settings.hash === true ? "#" : "?" : "";
-  var $numbers = settings.numbers === false ? false : true;
+new function(settings) {
+
+  var $separator;
+  var $spaces;
+  var $suffix;
+  var $prefix;
+  var $hash;
+  var $numbers;
+  assign_settings(settings);
+
+  function assign_settings(settings) {
+    $hash = (typeof settings.hash == 'undefined') ? '?' : settings.hash;
+    $prefix = settings.prefix || null;
+    
+    $separator = settings.separator || '&';
+    $spaces = settings.spaces === false ? false : true;
+    $suffix = settings.suffix === false ? '' : '[]';
+    $numbers = settings.numbers === false ? false : true;
+  };
   
   jQuery.parsequery = new function() {
     var is = function(o, t) {
@@ -77,7 +86,9 @@ new function(settings) {
       return target;
     };
     
-    var queryObject = function(a) {
+    var queryObject = function(a, settings) {
+      if (settings) assign_settings(settings);
+      
       var self = this;
       self.keys = {};
       
@@ -85,42 +96,40 @@ new function(settings) {
         jQuery.each(a.get(), function(key, val) {
           self.SET(key, val);
         });
-      } else {
-        jQuery.each(arguments, function(i, v) {
-          var q = "" + this;
-          q = q.replace(/^[?#]/,''); // remove any leading ? || #
-          q = q.replace(/[;&]$/,''); // remove any trailing & || ;
-          if ($spaces) q = q.replace(/[+]/g,' '); // replace +'s with spaces
-          
-          jQuery.each(q.split(/[&;]/), function(){
-            var key = decodeURIComponent(this.split('=')[0]);
-            // var val = decodeURIComponent(this.split('=')[1]);
-            var val = (function(keyval, key) {
-              if (key) {
-                var val = keyval.split('=')[1];
-                return val ? decodeURIComponent(val) : true;
-              }
-              else {
-                return null;
-              }
-            })(this, key);
-            
-            if (!key) return;
-            
-            if ($numbers) {
-              if (/^[+-]?[0-9]+\.[0-9]*$/.test(val)) // simple float regex
-                val = parseFloat(val);
-              else if (/^[+-]?[0-9]+$/.test(val)) // simple int regex
-                val = parseInt(val, 10);
+      } 
+      else {
+        var q = "" + a;
+        q = q.replace(/^[?#]/,''); // remove any leading ? || #
+        q = q.replace(/[;&]$/,''); // remove any trailing & || ;
+        if ($spaces) q = q.replace(/[+]/g,' '); // replace +'s with spaces
+        
+        jQuery.each(q.split(/[&;]/), function(){
+          var key = decodeURIComponent(this.split('=')[0]);
+          var val = (function(keyval, key) {
+            if (key) {
+              var val = keyval.split('=')[1];
+              return val ? decodeURIComponent(val) : true;
             }
-            
-            val = (!val && val !== 0) ? true : val;
-            
-            if (val !== false && val !== true && typeof val != 'number')
-              val = val;
-            
-            self.SET(key, val);
-          });
+            else {
+              return null;
+            }
+          })(this, key);
+          
+          if (!key) return;
+          
+          if ($numbers) {
+            if (/^[+-]?[0-9]+\.[0-9]*$/.test(val)) // simple float regex
+              val = parseFloat(val);
+            else if (/^[+-]?[0-9]+$/.test(val)) // simple int regex
+              val = parseInt(val, 10);
+          }
+          
+          val = (!val && val !== 0) ? true : val;
+          
+          if (val !== false && val !== true && typeof val != 'number')
+            val = val;
+          
+          self.SET(key, val);
         });
       }
       return self;
@@ -181,9 +190,7 @@ new function(settings) {
         return this.copy().EMPTY();
       },
       copy: function() {
-        var q = new queryObject(this);
-        q.setBase(this.getBase());
-        return q;
+        return new queryObject(this);
       },
       COMPACT: function() {
         function build(orig) {
@@ -207,13 +214,6 @@ new function(settings) {
       },
       compact: function() {
         return this.copy().COMPACT();
-      },
-      setBase: function(base_url) {
-        this.base_url = base_url;
-        return this;
-      },
-      getBase: function() {
-        return this.base_url;
       },
       toString: function() {
         var i = 0, queryString = [], chunks = [], self = this;
@@ -242,38 +242,29 @@ new function(settings) {
         
         if (chunks.length > 0) queryString.push($hash);
         queryString.push(chunks.join($separator));
-        
-        return (this.getBase() || "") + queryString.join("");
+        return ($prefix || '') + queryString.join("");
       }
     };
     
-    // return new queryObject(location.search, location.hash);
-    return function(url) {
-      function parse_url() {
-        var m = url.match(/^(.*?)[?](.+?)(?:#.+)?$/);
-        return m ? {
-          base: m[1],
-          search: m[2]
-        } : {
-          base: url,
-          search: ""
-        };
+    function parse_url(url) {
+      var m = url && url.match(/^(.*?)[?](.+?)(?:#.+)?$/);
+      return m ? {
+        base: m[1],
+        search: m[2]
+      } : {
+        base: url,
+        search: ""
       };
-      var u = parse_url(url);
-      var q = new queryObject(u.search);
-      q.setBase(u.base);
-      return q;
     };
-    // function(url) {
-    //   // var search = url.replace(/^.*?[?](.+?)(?:#.+)?$/, "$1");
-    //   var bs = (function() {
-    //     var p = url.split('?');
-    //     return p.length > 1 ? {base: p.shift(), search:p.join()} : {base:null, search:p[0]};
-    //   })();
-    //   
-    //   var q = new queryObject(bs.search);
-    //   if (bs.base) q.setBase(bs.base);
-    //   return q;
-    // };
+    
+    return function(url, settings) {
+      if (!settings) settings = {};
+      
+      var u = parse_url(url);
+      if (u.base) settings.prefix = u.base;
+      
+      assign_settings(settings);
+      return  new queryObject(u.search);
+    };
   };
 }(jQuery.parsequery || {}); // Pass in jQuery.query as settings object

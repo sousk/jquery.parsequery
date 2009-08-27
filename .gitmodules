@@ -1,0 +1,3 @@
+[submodule "vendor/qunit-spec"]
+	path = vendor/qunit-spec
+	url = git://github.com/sousk/qunit-spec.git

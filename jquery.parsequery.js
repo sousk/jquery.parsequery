@@ -20,11 +20,13 @@ new function(settings) {
   var $prefix;
   var $hash;
   var $numbers;
+  var $preserve_numeric_index;
   assign_settings(settings);
 
   function assign_settings(settings) {
     $hash = (typeof settings.hash == 'undefined') ? '?' : settings.hash;
     $prefix = settings.prefix || null;
+    $preserve_numeric_index = settings.preserve_numeric_index || false;
     
     $separator = settings.separator || '&';
     $spaces = settings.spaces === false ? false : true;
@@ -228,16 +230,23 @@ new function(settings) {
         };
         var build = function(obj, base) {
           var newKey = function(key) {
-            return !base || base == "" ? [key].join("") : [base, "[", key, "]"].join("");
+            // return !base || base == "" ? [key].join("") : [base, "[", key, "]"].join("");
+            // add hock implementation for php
+            return !base || base == "" ? [key].join("") : [
+              base, "[", 
+              $preserve_numeric_index || typeof(key) != 'number' ? key : "",
+              "]"
+            ].join("");
           };
           jQuery.each(obj, function(key, value) {
-            if (typeof value == 'object') 
+            if (typeof value == 'object') {
               build(value, newKey(key));
-            else
+            }
+            else {
               addFields(chunks, newKey(key), value);
+            }
           });
         };
-        
         build(this.keys);
         
         if (chunks.length > 0) queryString.push($hash);

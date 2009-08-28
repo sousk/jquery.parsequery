@@ -2,7 +2,7 @@ window.log = getLogger();
 function test_parsequery() {
   var q;
   var default_query =         "http://localhost:3000/foo_bar/?action=view&section=info&id=123&debug&testy[]=true&testy[]=false&testy[]";
-  var default_query_encoded = "http://localhost:3000/foo_bar/?action=view&section=info&id=123&debug&testy%5B0%5D=true&testy%5B1%5D=false&testy%5B2%5D";
+  var default_query_encoded = "http://localhost:3000/foo_bar/?action=view&section=info&id=123&debug&testy%5B%5D=true&testy%5B%5D=false&testy%5B%5D";
   var setup = function(query) {
     up();
     q = $.parsequery(query ? query : default_query);
@@ -49,6 +49,26 @@ function test_parsequery() {
     setup(newq);
     equals(q.toString(), newq);
     equals(q.set('foo', 123).toString(), newq+'?foo=123');
+  });
+  
+  //----------------------------------------------------------
+  module("special parameter");
+  //----------------------------------------------------------
+  test("php list style parameter", function() {
+    var param = "?categories[]=10&categories[]=20";
+    setup(param);
+    equals(decodeURI(q.toString()), param);
+    q = q.set('categories[]', 'foo');
+    equals(decodeURI(q.toString()), param + '&categories[]=foo');
+  });
+  
+  test("numeric index parameter", function() {
+    var param = "?categories[1]=10&categories[2]=20";
+    q = $.parsequery(param, {preserve_numeric_index: true});
+    
+    equals(decodeURI(q.toString()), param);
+    q = q.set('categories[]', 'foo');
+    equals(decodeURI(q.toString()), param + '&categories[3]=foo');
   });
   
   //----------------------------------------------------------

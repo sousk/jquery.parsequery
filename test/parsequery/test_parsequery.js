@@ -9,6 +9,21 @@ function test_parsequery() {
   };
   
   //----------------------------------------------------------
+  module("bugs on parsequery.js");
+  //----------------------------------------------------------
+  if (true) {
+    test("got error on name[]=null", function() {
+      setup('/path');
+      q = q.set('categories[]', null);
+      equals(decodeURI(q.toString()), '/path');
+      
+      q = q.set('categories[]', 1);
+      equals(decodeURI(q.toString()), '/path?categories[]=1');
+    });
+  }
+  
+
+  //----------------------------------------------------------
   module("bugs on original-2.1.5");
   //----------------------------------------------------------
   if (true) {
@@ -25,6 +40,7 @@ function test_parsequery() {
       equals(q.get('debug'), true); // it got "undefined"
     });
   }
+
 
   //----------------------------------------------------------
   module("basement");

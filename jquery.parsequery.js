@@ -239,7 +239,9 @@ new function(settings) {
             ].join("");
           };
           jQuery.each(obj, function(key, value) {
-            if (typeof value == 'object') {
+            
+            // rebuild or assign
+            if (Object.prototype.isPrototypeOf(value)) {
               build(value, newKey(key));
             }
             else {
